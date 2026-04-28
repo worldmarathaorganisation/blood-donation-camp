@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<div style="text-align:center; margin-bottom:20px;">
+  <img src="banner.jpg" style="width:100%; max-width:900px; border-radius:12px;">
+</div>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>रक्तदान शिबिर – लोकेशन्स</title>
+  <style>
+    :root{
+      --red:#c5161d;
+      --dark:#222;
+      --muted:#666;
+      --bg:#f6f7f9;
+      --card:#fff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--dark)}
+    .container{max-width:1100px;margin:auto;padding:16px}
+    header{
+      position:sticky;top:0;z-index:10;
+      background:linear-gradient(90deg,#b31217,#e52d27);
+      color:#fff;padding:14px 16px;
+      display:flex;align-items:center;gap:12px;justify-content:space-between
+    }
+    header h1{font-size:18px;margin:0;font-weight:700}
+    .cta{background:#fff;color:#b31217;border:none;padding:10px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+    .controls input,.controls select{
+      padding:10px;border-radius:8px;border:1px solid #ddd;min-width:180px
+    }
+    .grid{
+      display:grid;gap:14px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr))
+    }
+    .card{
+      background:var(--card);border-radius:12px;padding:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,.06);border:1px solid #eee
+    }
+    .title{font-weight:700;margin-bottom:6px}
+    .meta{font-size:13px;color:var(--muted);margin-bottom:8px}
+    .addr{font-size:14px;margin-bottom:10px}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{
+      border:none;border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:600
+    }
+    .btn.call{background:var(--red);color:#fff}
+    .btn.map{background:#eef2f7}
+    .badge{
+      display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;
+      background:#ffe9ea;color:#a10d13;margin-left:6px
+    }
+    footer{padding:20px 0;text-align:center;color:#777;font-size:13px}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🩸 रक्तदान शिबिर – 10 मे 2026 (पुणे)</h1>
+  <button class="cta" onclick="scrollToList()">Nearest Camp</button>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <input id="search" placeholder="Search area / pincode..." oninput="render()" />
+    <select id="city" onchange="render()">
+      <option value="all">All</option>
+      <option value="pune">Pune</option>
+      <option value="other">Other Cities</option>
+    </select>
+  </div>
+
+  <div id="list" class="grid"></div>
+
+  <footer>
+    🩸 रक्तदान – सर्वश्रेष्ठ दान • Walk-in allowed • 15 मिनिटांची प्रक्रिया
+  </footer>
+</div>
+
+<script>
+const locations = [
+  // Pune (10 May)
+  {city:'pune', name:'श्री शिवाजी व्यायाम मंडळ', area:'शिवाजीनगर', pin:'411005',
+   addr:'क्रिडांगण, शिवाजीनगर गावठाण, पुणे',
+   contacts:['9657015222']},
+
+  {city:'pune', name:'द सायन्स हब', area:'चिखली', pin:'411019',
+   addr:'पोलाईट हार्मोनी, साने चौक, चिखली-आकुर्डी रोड',
+   contacts:['7208782891']},
+
+  {city:'pune', name:'मास्टर कोड इन्फोटेक', area:'हडपसर', pin:'411028',
+   addr:'पहिला मजला, विश्वास कॉम्प्लेक्स, उत्कर्षनगर, गाडीतळ जवळ',
+   contacts:['9553633350']},
+
+  {city:'pune', name:'किर्लोस्कर कमिन्स युनियन हॉल', area:'कोथरूड', pin:'411038',
+   addr:'गल्ली क्र. 3, डहाणूकर कॉलनी',
+   contacts:['9987151172']},
+
+  {city:'pune', name:'हनुमान मंदिर परिसर', area:'मांजरी खुर्द', pin:'412307',
+   addr:'गाव – मांजरी खुर्द, ता. हवेली',
+   contacts:['9930957166']},
+
+  {city:'pune', name:'फेस & डेंटल इंटरनॅशनल क्लिनिक', area:'निगडी', pin:'411044',
+   addr:'सेक्टर 26, आकुर्डी स्टेशन जवळ, प्राधिकरण',
+   contacts:['9819707508']},
+
+  {city:'pune', name:'नागराज तरुण मंडळ', area:'भोर', pin:'412206',
+   addr:'नागोबा आळी, भोर',
+   contacts:['9657015222']},
+
+  {city:'pune', name:'जय हनुमान तरुण मंडळ', area:'पौड (मुळशी)', pin:'412108',
+   addr:'मागील आळी, पौड',
+   contacts:['7208782891']},
+
+  {city:'pune', name:'तनिष्क पार्क क्लब हाऊस', area:'चऱ्होली', pin:'412105',
+   addr:'चऱ्होली, पुणे',
+   contacts:['9553633350']},
+
+  {city:'pune', name:'अप्रतिम कॉम्प्लेक्स', area:'सासवड', pin:'',
+   addr:'सोनोरी रोड, वेंकटेश नंदनवन जवळ',
+   contacts:['9987151172']},
+
+  // Other dates
+  {city:'other', name:'महादेव मंदिर', area:'ठाणे पूर्व', pin:'400603',
+   addr:'कोपरी मार्केट, ठाणे',
+   contacts:['9657015222'], date:'3 मे'},
+
+  {city:'other', name:'प्लिस कर्डिएट क्लिनिक', area:'कराड', pin:'',
+   addr:'मंगळवार पेठ, कराड',
+   contacts:['7208782891'], date:'3 मे'},
+
+  {city:'other', name:'अश्वमेध क्लिनिक लायब्ररी', area:'मसूर (कराड)', pin:'',
+   addr:'राजपुरी स्वीट वरती, मसूर',
+   contacts:['9553633350'], date:'3 मे'},
+
+  {city:'other', name:'हॉटेल निर्मल', area:'सातारा', pin:'',
+   addr:'एस.टी. स्टॅण्ड पाठीमागे',
+   contacts:['9987151172'], date:'1 मे'},
+
+  {city:'other', name:'स्वराज्य मंगल कार्यालय', area:'अहिल्यानगर (शेवगाव)', pin:'',
+   addr:'शेवगाव, अहिल्यानगर',
+   contacts:['9819707508'], date:'5 मे'}
+];
+
+function scrollToList(){
+  document.getElementById('list').scrollIntoView({behavior:'smooth'});
+}
+
+function match(item, q){
+  if(!q) return true;
+  q = q.toLowerCase();
+  return (item.name + ' ' + item.area + ' ' + item.addr + ' ' + item.pin)
+    .toLowerCase().includes(q);
+}
+
+function render(){
+  const q = document.getElementById('search').value.trim();
+  const city = document.getElementById('city').value;
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+
+  const data = locations.filter(l =>
+    (city==='all' || l.city===city) && match(l,q)
+  );
+
+  data.forEach(l=>{
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="title">
+        ${l.name}
+        ${l.city==='pune' ? '<span class="badge">10 मे</span>' : `<span class="badge">${l.date||''}</span>`}
+      </div>
+      <div class="meta">${l.area} ${l.pin ? '• '+l.pin : ''}</div>
+      <div class="addr">${l.addr}</div>
+      <div class="actions">
+        ${l.contacts.map(c=>`<a class="btn call" href="tel:${c}">Call ${c}</a>`).join('')}
+        <button class="btn map" onclick="openMap('${l.name} ${l.area} ${l.addr}')">Open Map</button>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+
+  if(!data.length){
+    list.innerHTML = `<div class="card">No results. Try a different search.</div>`;
+  }
+}
+
+function openMap(q){
+  const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+  window.open(url,'_blank');
+}
+
+render();
+</script>
+</body>
+</html>
